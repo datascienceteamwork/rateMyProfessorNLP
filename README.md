@@ -56,7 +56,7 @@ python gradeit.py
 ```
 
 Al primo avvio lo script:
-1. Scarica automaticamente il dataset da HuggingFace e lo salva in `outputs/dataset_raw.csv`
+1. Scarica automaticamente il dataset da HuggingFace e lo salva in locale
 2. Esegue preprocessing, feature extraction, training e valutazione per entrambe le classificazioni
 3. Genera tutti i grafici nelle rispettive cartelle `outputs/plots_*`
 4. Salva i modelli addestrati in `models/`
