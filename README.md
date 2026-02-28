@@ -52,7 +52,7 @@ pip install -r requirements.txt
 ### Esecuzione completa della pipeline
 
 ```bash
-python prova_avanzata.py
+python gradeit.py
 ```
 
 Al primo avvio lo script:
