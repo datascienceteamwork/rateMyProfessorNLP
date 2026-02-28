@@ -1,12 +1,8 @@
 # RateMyProfessors — Sentiment Analysis Pipeline
 
-Progetto di Data Science per il corso di **Ingegneria Informatica e dell'Automazione**  
-Università Politecnica delle Marche — A.A. 2025/2026
-
-> **Docente:** Prof. Domenico Ursino  
 > **Gruppo:** Lorenzo Meloccaro · Yassir Flavio Suarez Sanchez · Domenico La Porta
 
----
+
 
 ## Descrizione
 
