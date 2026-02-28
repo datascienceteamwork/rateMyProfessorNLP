@@ -15,37 +15,6 @@ Il progetto confronta due approcci:
 
 Per ciascun approccio vengono addestrati, ottimizzati e confrontati sei modelli base più tre ensemble (Voting Hard, Voting Soft, Stacking).
 
----
-
-## Struttura del Progetto
-
-```
-.
-├── prova_avanzata.py          # Script principale della pipeline
-├── requirements.txt           # Dipendenze Python
-├── README.md                  # Questo file
-│
-├── outputs/
-│   ├── dataset_raw.csv        # Dataset scaricato e cachato (generato al primo run)
-│   ├── run_log_TIMESTAMP.txt  # Log completo di ogni esecuzione
-│   ├── plots_2class/          # Grafici classificazione binaria
-│   │   ├── plot_01_class_distribution.png
-│   │   ├── plot_02_confusion_matrix.png
-│   │   ├── plot_03_roc_curves.png
-│   │   ├── plot_04_precision_recall_curves.png
-│   │   ├── plot_05_top_tfidf_features.png
-│   │   ├── plot_06_cv_scores.png
-│   │   └── plot_07_learning_curves.png
-│   └── plots_3class/          # Grafici classificazione multi-classe
-│       └── (stessa struttura di plots_2class)
-│
-└── models/                    # Artefatti salvati (generati dopo il training)
-    ├── vectorizer_2class.joblib
-    ├── model_2class.joblib
-    ├── vectorizer_3class.joblib
-    ├── model_3class.joblib
-    └── thresholds_3class.joblib
-```
 
 ---
 
