@@ -26,23 +26,6 @@ Il dataset è composto da due sole colonne:
 | `text` | `string` | Testo della recensione scritta dallo studente |
 | `label` | `int64` | Etichetta di sentiment: `0` = Negativo, `1` = Positivo |
 
-### Esempio di record
-
-```
-text:  "Professor Agresta taught our ITAL101 class this semester and she was
-        awesome! The class was super easy. No quizzes/tests, just a weekly
-        homework and lecture assignment. She gives good feedback and lets you
-        turn in things late with no penalty. Great professor!"
-label: 1
-```
-
-```
-text:  "Shes nice but her assignments aren't clear and are a lot of work.
-        She also doesn't grade assignments until like 1-2 months later."
-label: 0
-```
-
----
 
 ## Distribuzione delle Classi
 
@@ -90,19 +73,13 @@ studenti a motivare più estesamente un giudizio negativo.
 
 ---
 
-## Qualità dei Dati
 
-| Problema | Quantità | Note |
-|---|---|---|
-| Valori nulli (`NaN`) | 3 | Da rimuovere in preprocessing |
-| Testi vuoti (stringa vuota) | 19 | Da rimuovere in preprocessing |
-| Testi troncati a 350 caratteri | 2.458 (6.2%) | Limite della piattaforma di origine |
 
-> **Nota sul troncamento:** 2.458 recensioni (6.2% del dataset) raggiungono
-> esattamente il limite massimo di 350 caratteri, suggerendo che il testo
-> originale fosse più lungo e sia stato tagliato dalla piattaforma o dal processo
-> di raccolta dati. Questo introduce una potenziale distorsione nelle recensioni
-> più elaborate.
+ **Nota sul troncamento:** 2.458 recensioni (6.2% del dataset) raggiungono
+ esattamente il limite massimo di 350 caratteri, suggerendo che il testo
+ originale fosse più lungo e sia stato tagliato dalla piattaforma o dal processo
+ di raccolta dati. Questo introduce una potenziale distorsione nelle recensioni
+ più elaborate.
 
 ---
 
