@@ -15,6 +15,11 @@ Il progetto confronta due approcci:
 
 Per ciascun approccio vengono addestrati, ottimizzati e confrontati sei modelli base più tre ensemble (Voting Hard, Voting Soft, Stacking).
 
+Il progetto include inoltre un task di **Information Extraction**, che affianca alla classificazione due tecniche complementari:
+
+- **Relation Extraction** — estrazione di triple (aspetto, descrittore, sentiment) tramite dependency parsing (spaCy)
+- **Keyword/Keyphrase Extraction** — estrazione di espressioni ricorrenti per classe di sentiment tramite RAKE, con filtro di frequenza documentale
+
 
 ---
 
@@ -43,13 +48,16 @@ source venv/bin/activate
 
 ```bash
 pip install -r requirements.txt
+python -m spacy download en_core_web_sm
 ```
+
+> Il modello `en_core_web_sm` di spaCy è richiesto solo per lo script di Information Extraction (`information_extraction_v6.py`).
 
 ---
 
 ## Utilizzo
 
-### Esecuzione completa della pipeline
+### Esecuzione della pipeline di sentiment analysis
 
 ```bash
 python gradeit.py
@@ -63,6 +71,27 @@ Al primo avvio lo script:
 5. Salva il log completo in `outputs/run_log_YYYYMMDD_HHMMSS.txt`
 
 Dalle esecuzioni successive il dataset viene caricato dal CSV locale, saltando il download.
+
+### Esecuzione dell'Information Extraction
+
+```bash
+python information_extraction_v6.py
+```
+
+Riusa la cache del dataset già generata da `gradeit.py` (`outputs/rateMyProffesor_HuggingFace_dataset.csv`). Parametri opzionali:
+
+```bash
+python information_extraction_v6.py --n_reviews 4000 --top_k 15 --top_k_relations 15
+```
+
+Output generati in `outputs/information_extraction/`:
+
+| File | Contenuto |
+|---|---|
+| `aspect_sentiment_matrix.csv` / `aspect_sentiment_heatmap.png` | matrice aspetto × sentiment |
+| `aspect_relations.csv` / `aspect_relations_barplot.png` | top relazioni (aspetto, descrittore) |
+| `keywords_per_class.csv` / `keywords_barplot.png` | top keyphrase per classe (RAKE) |
+| `ie_report.txt` | report testuale riassuntivo |
 
 ---
 
@@ -114,6 +143,28 @@ Valutazione  (5-Fold Stratified CV + Test Set)
   • Learning Curves
 ```
 
+### Pipeline di Information Extraction (`information_extraction_v6.py`)
+
+```
+Raw Text (cache condivisa con gradeit.py)
+   │
+   ▼
+Relation Extraction (spaCy dependency parsing)
+  • Match aspetto (dizionario di trigger: teaching, exams, workload, ...)
+  • Estrazione descrittore (amod / nsubj+acomp / conj)
+  • Sentiment di frase (TextBlob polarity)
+   │
+   ▼
+Keyword Extraction (RAKE)
+  • Filtro lingua (langdetect, solo recensioni in inglese)
+  • Estrazione candidate su pool ampio
+  • Ordinamento per frequenza documentale, poi per score RAKE
+  • Filtro doc_freq ≥ 3 (con fallback automatico)
+   │
+   ▼
+Output: matrice aspetto×sentiment, top relazioni, top keyphrase, report
+```
+
 ---
 
 ## Modelli e Risultati
@@ -144,11 +195,16 @@ Valutazione  (5-Fold Stratified CV + Test Set)
 
 **Best model (test set):** Stacking — Negative 85.6%, Neutral 78.6%, Positive 81.0%
 
+### Information Extraction
+
+- **Relation Extraction:** 7 aspetti monitorati (teaching, exams, workload, clarity, grading, attitude, attendance). Aspetto più menzionato: *teaching* (657 relazioni positive su un campione di 4.000 recensioni).
+- **Keyword Extraction:** keyphrase ricorrenti per classe dopo filtro di frequenza documentale, es. *"gives pop quizzes"* (Negative, 4 recensioni), *"would definitely recommend taking"* (Positive, 5 recensioni).
+
 ---
 
 ## Configurazione
 
-Tutti i parametri principali sono centralizzati nella classe `PipelineConfig` all'interno dello script:
+Tutti i parametri principali della pipeline di sentiment analysis sono centralizzati nella classe `PipelineConfig` all'interno di `gradeit.py`:
 
 | Parametro | Valore default | Descrizione |
 |---|---|---|
@@ -162,6 +218,17 @@ Tutti i parametri principali sono centralizzati nella classe `PipelineConfig` al
 | `NEUTRAL_QUANTILE_HIGH` | 0.70 | Soglia superiore classe neutra |
 | `RANDOM_STATE` | 42 | Seed per riproducibilità |
 
+I parametri della pipeline di Information Extraction sono centralizzati nella classe `Config` all'interno di `information_extraction_v6.py`:
+
+| Parametro | Valore default | Descrizione |
+|---|---|---|
+| `N_REVIEWS` | 4000 | Subset di recensioni analizzate |
+| `TOP_K_KEYWORDS` | 15 | Keyphrase estratte per classe |
+| `TOP_K_RELATIONS` | 15 | Relazioni (aspetto, descrittore) estratte |
+| `MIN_DOC_FREQUENCY` | 3 | Frequenza documentale minima per una keyphrase |
+| `KEYWORD_CANDIDATE_POOL` | 800 | Pool di candidate RAKE su cui calcolare la doc_freq |
+| `SPACY_MODEL` | en_core_web_sm | Modello spaCy per il dependency parsing |
+
 ---
 
 ## Dataset
@@ -169,9 +236,9 @@ Tutti i parametri principali sono centralizzati nella classe `PipelineConfig` al
 - **Nome:** `ZephyrUtopia/ratemyprofessors-reviews-2-labels`
 - **Fonte:** [HuggingFace Datasets Hub](https://huggingface.co/datasets/ZephyrUtopia/ratemyprofessors-reviews-2-labels)
 - **Campioni totali:** 39.574
-- **Lingua:** Inglese
+- **Lingua:** prevalentemente inglese (minoranza di recensioni in francese/italiano, escluse nel task di Information Extraction)
 - **Distribuzione originale:** 73.8% Positive — 26.2% Negative
-- **Task:** Sentiment Analysis su recensioni di docenti universitari
+- **Task:** Sentiment Analysis e Information Extraction su recensioni di docenti universitari
 
 ---
 
@@ -179,7 +246,7 @@ Tutti i parametri principali sono centralizzati nella classe `PipelineConfig` al
 
 - Python ≥ 3.10
 - RAM consigliata: ≥ 8 GB (per XGBoost/LightGBM su matrice TF-IDF)
-- Connessione internet richiesta solo al primo avvio (download dataset)
+- Connessione internet richiesta solo al primo avvio (download dataset e modello spaCy)
 
 ---
 
